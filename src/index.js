@@ -1,17 +1,83 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import {Suspense} from 'react'
+
+const DemoComponent = React.lazy(() => import('./components/demoComponent'));
+
+const ThemeContext = React.createContext('light')
+
+// 错误边界
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state= {
+      hasError: false
+    }
+  }
+
+  static getDerivedStateFromError (error) {
+    return {hasError: true}
+  }
+
+  componentDidCatch (error, errorInfo) {
+    console.log(`componentDidCatch: error-${error} errorInfo-${errorInfo}`)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // UI降级
+      return <h1>子组件出错，UI降级提示语--GG</h1>
+    } 
+    return this.props.children
+  }
+}
+
+class ErrorComp extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      name: 'yqb'
+    }
+  }
+  render () {
+    if (this.state.name) {
+      throw new Error('I crashed!');
+    } else {
+      return(<div className="demo">
+      <p className={this.state.name}>
+        {this.state.name}
+      </p>
+      <span>
+        123
+      </span>
+    </div>)
+    }
+    // let aaa = this.props.cc.dd
+    
+  }
+}
+
+// Context  
+class ThemeButton extends React.Component {
+  static contextType = ThemeContext;
+  render () {
+  return (<button>{this.context}</button>)
+  }
+}
+
+// ThemeButton.contextType = ThemeContext
 
 function HtmlTmp1() {
   // 测试import()动态加载
   let timer = setInterval(() => {
     if (new Date().getTime() % 2 === 0) {
-      import('./demo1.js').then(() => {
+      import('./components/demo1.js').then(() => {
         console.log(`demo1:${window.demo1}; demo2:${window.demo2}`)
       })
       window.clearInterval(timer)
     } else {
-      import('./demo2.js').then(() => {
+      import('./components/demo2.js').then(() => {
         console.log(`demo1:${window.demo1}; demo2:${window.demo2}`)
       })
       window.clearInterval(timer)
@@ -19,6 +85,10 @@ function HtmlTmp1() {
   }, 100)
   return(
     <div className="demo">
+      <ThemeContext.Provider value="dark">
+      <ThemeButton onClick={() => {this.changeContext()}}/>
+      </ThemeContext.Provider>
+      <br/>
       <label htmlFor="namedInput">Name:</label>
       <input id="namedInput" type="text" name="name"/>
     </div>
@@ -184,6 +254,9 @@ class EssayForm extends React.Component {
   render() {
     return (
       <div className="demo">
+        <Suspense fallback={<div className="demo-com-loading">Loading...</div>}>
+          <DemoComponent />
+        </Suspense>
         <form onSubmit={this.handleSubmit}>
         <label>
           文章:
@@ -468,6 +541,9 @@ class Game extends React.Component {
           <WelcomeDialog/>
           <ShowSplitPane/>
           <HtmlTmp1/>
+          <ErrorBoundary>
+            <ErrorComp/>
+          </ErrorBoundary>
         </div>
       </div>
     );

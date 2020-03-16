@@ -61,3 +61,7 @@ ol, ul {
 .demo div {
   margin: 30px 0 0 0;
 }
+.demo-com-loading {
+  font-size: 100px;
+  color: red;
+}
