@@ -7,6 +7,37 @@ const DemoComponent = React.lazy(() => import('./components/demoComponent'));
 
 const ThemeContext = React.createContext('light')
 
+// Refs 转发
+const FancyButton = React.forwardRef((props, ref) => (
+  <button ref={ref} className="FancyButton">
+    {props.children}
+  </button>
+));
+class RefSPick extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      ref: React.createRef()
+    }
+  }
+  clickMe () {
+    console.log(`ref: ${this.state.ref}`)
+  }
+  render () {
+    const ref = React.createRef()
+    console.log('???', ref)
+    return(<FancyButton ref={this.state.ref} onClick={() => {this.clickMe()}}>Click me!</FancyButton>)
+  }
+}
+
+// function FancyButton(props) {
+//   return (
+//     <button className="FancyButton">
+//       {props.children}
+//     </button>
+//   );
+// }
+
 // 错误边界
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -37,11 +68,12 @@ class ErrorComp extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      name: 'yqb'
+      name: ''
     }
   }
   render () {
     if (this.state.name) {
+      // dev挂起 打包打开
       throw new Error('I crashed!');
     } else {
       return(<div className="demo">
@@ -53,8 +85,6 @@ class ErrorComp extends React.Component {
       </span>
     </div>)
     }
-    // let aaa = this.props.cc.dd
-    
   }
 }
 
@@ -544,6 +574,9 @@ class Game extends React.Component {
           <ErrorBoundary>
             <ErrorComp/>
           </ErrorBoundary>
+          <div className="demo">
+            <RefSPick/>
+          </div>
         </div>
       </div>
     );
