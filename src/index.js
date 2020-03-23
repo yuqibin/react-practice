@@ -1,15 +1,142 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {Suspense} from 'react'
 
 const DemoComponent = React.lazy(() => import('./components/demoComponent'));
 
 const ThemeContext = React.createContext('light')
 
+// Portals  子节点渲染到父节点以外的dom节点
+
+class PortasComp extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {flag : false}
+  }
+  handleClick () {
+    this.setState(state => ({flag : !state.flag}))
+    console.log(this.state.flag)
+  }
+
+  render () {
+    return (<div>
+      <button onClick={() => this.handleClick()}>按钮呀</button>
+      <div className="por-a">
+        por-a: <PortasChildCom flag={this.state.flag}>嘻嘻</PortasChildCom>
+      </div>
+      <div className="por-b" id="PortasClildrenShow">
+        por-b:
+      </div>
+    </div>)
+  }
+}
+
+class PortasChildCom extends React.Component {
+  constructor (props) {
+    super(props)
+    this.el = document.createElement('span')
+  }
+
+  componentDidMount () {
+    document.getElementById('PortasClildrenShow').appendChild(this.el)
+  }
+
+  componentWillUnmount () {
+    document.getElementById('PortasClildrenShow').removeChild(this.el)
+  }
+
+  render() {
+    return this.props.flag ? ReactDOM.createPortal(this.props.children, this.el) : this.props.children
+  }
+}
+
+
+// 性能优化  -----------
+// 继承PureComponent
+class CounterButton extends React.PureComponent {
+  constructor (props) {
+    super(props)
+    this.state = {
+      count: 1
+    }
+  }
+
+  render () {
+    return (<button color={this.props.color}
+                    onClick={() => this.setState(state => ({count: state.count + 1}))}>
+                      Count: {this.state.count}
+                    </button>)
+  }
+}
+
+// -------深入jsx JSX是一种语法糖  方便写  本质
+
+// JSX 类型不能是一个表达式
+const jsxComps = {
+  photo: (props) => {
+    return (<div className="photo"> i am photo <br/> {props.children}  </div>)
+  },
+  video: (props) => {
+    return(<div className="video"> i am video <br/> {props.children}  </div>)
+  }
+}
+
+function JsxStory(props) {
+  const JxsComps = jsxComps[props.type]
+  return <JxsComps story={props.story}>我是children，穷给</JxsComps>
+}
+
+// 点语法  可构造性强
+const MyComponents = {
+  DatePicker: function DatePicker(props) {
+  return <div>imagine a {props.color} dataPicker here.</div>
+  }
+}
+
+function BlueDataPicker() {
+    return <MyComponents.DatePicker color="blue" />
+}
+
+//  高阶组件HOC
+const DataSource = {}
+// 此函数接收一个组件...返回一个新组件  
+function withSubscription(WrappedComponent, selectData) {
+  // ...并返回另一个组件...
+  return class extends React.Component {
+    constructor(props) {
+      super(props);
+      this.handleChange = this.handleChange.bind(this);
+      this.state = {
+        data: selectData(DataSource, props)
+      };
+    }
+
+    componentDidMount() {
+      // ...负责订阅相关的操作...
+      DataSource.addChangeListener(this.handleChange);
+    }
+
+    componentWillUnmount() {
+      DataSource.removeChangeListener(this.handleChange);
+    }
+
+    handleChange() {
+      this.setState({
+        data: selectData(DataSource, this.props)
+      });
+    }
+
+    render() {
+      // ... 并使用新数据渲染被包装的组件!
+      // 请注意，我们可能还会传递其他属性
+      return <WrappedComponent data={this.state.data} {...this.props} />;
+    }
+  };
+}
+
 // Refs 转发
 const FancyButton = React.forwardRef((props, ref) => (
-  <button ref={ref} className="FancyButton">
+  <button className="ref-btn" ref={ref} onClick={props.onClick}>
     {props.children}
   </button>
 ));
@@ -17,16 +144,25 @@ class RefSPick extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      ref: React.createRef()
+      ref: React.createRef(),
+      timeNumStr: new Date().getTime()
     }
   }
+
   clickMe () {
-    console.log(`ref: ${this.state.ref}`)
+    let ref = this.state.ref
+    ref.current.innerHTML = '改变了ref的current对应的DOM的内容' + (new Date().getTime() - this.state.timeNumStr)
+    this.setState({ref})
   }
+
+  componentDidMount () {
+    console.log('??', this.state.ref.current)
+  }
+  
   render () {
-    const ref = React.createRef()
-    console.log('???', ref)
-    return(<FancyButton ref={this.state.ref} onClick={() => {this.clickMe()}}>Click me!</FancyButton>)
+    // const ref = React.createRef()
+    // console.log('???', ref)
+    return(<FancyButton ref={this.state.ref} className="66" onClick={() => this.clickMe()}>Click me!</FancyButton>)
   }
 }
 
@@ -576,6 +712,18 @@ class Game extends React.Component {
           </ErrorBoundary>
           <div className="demo">
             <RefSPick/>
+          </div>
+          <div className="demo">
+            <BlueDataPicker/>
+          </div>
+          <div className="demo">
+            <JsxStory story="111" type="video">我是JsxStory的props.children</JsxStory>
+          </div>
+          <div className="demo">
+            <CounterButton/>
+          </div>
+          <div className="demo">
+            <PortasComp></PortasComp>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 20px;
   padding: 0 0 200px 0;
+  font-size: 20px;
 }
 
 ol, ul {
@@ -65,4 +66,8 @@ ol, ul {
 .demo-com-loading {
   font-size: 100px;
   color: red;
+}
+
+.ref-btn {
+  cursor: pointer;
 }
