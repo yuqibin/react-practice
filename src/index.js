@@ -1,6 +1,11 @@
-import React, {Suspense} from 'react';
+import React, {Suspense, Profiler} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+
+// 不使用JSX
+function NoJsxComp(props) {
+  return React.createElement('div', null, `Hello ${props.children}`)
+}
 
 const DemoComponent = React.lazy(() => import('./components/demoComponent'));
 
@@ -19,14 +24,27 @@ class PortasComp extends React.Component {
   }
 
   render () {
+    const arr = [1,2,3,4,5,6]
     return (<div>
       <button onClick={() => this.handleClick()}>按钮呀</button>
-      <div className="por-a">
-        por-a: <PortasChildCom flag={this.state.flag}>嘻嘻</PortasChildCom>
+      <div className="por-a" onClick={() => {console.log('por-a')}}>
+        por-a: <PortasChildCom flag={this.state.flag}>
+          <span>嘻嘻</span>
+        </PortasChildCom>
       </div>
-      <div className="por-b" id="PortasClildrenShow">
+      <div className="por-b" 
+            onClick={() => {console.log('por-b')}}
+            id="PortasClildrenShow" style={{display : (this.state.flag ? 'block':'none')}}>
         por-b:
       </div>
+      {
+        this.state.flag && <p>xixi</p>
+      }
+      {
+        arr.map((num) => {
+         return <div key={num} value={num}>{num}</div> 
+        })
+      }
     </div>)
   }
 }
@@ -100,6 +118,7 @@ function BlueDataPicker() {
 //  高阶组件HOC
 const DataSource = {}
 // 此函数接收一个组件...返回一个新组件  
+// eslint-disable-next-line no-unused-vars
 function withSubscription(WrappedComponent, selectData) {
   // ...并返回另一个组件...
   return class extends React.Component {
@@ -723,7 +742,12 @@ class Game extends React.Component {
             <CounterButton/>
           </div>
           <div className="demo">
-            <PortasComp></PortasComp>
+            <Profiler id="myRenderTimeTest" onRender={onRenderCallback}>
+              <PortasComp></PortasComp>
+            </Profiler>
+          </div>
+          <div className="demo">
+            <NoJsxComp>Bob</NoJsxComp>
           </div>
         </div>
       </div>
@@ -731,6 +755,18 @@ class Game extends React.Component {
   }
 }
 
+function onRenderCallback(
+  id, // 发生提交的 Profiler 树的 “id”
+  phase, // "mount" （如果组件树刚加载） 或者 "update" （如果它重渲染了）之一
+  actualDuration, // 本次更新 committed 花费的渲染时间
+  baseDuration, // 估计不使用 memoization 的情况下渲染整颗子树需要的时间
+  startTime, // 本次更新中 React 开始渲染的时间
+  commitTime, // 本次更新中 React committed 的时间
+  interactions // 属于本次更新的 interactions 的集合
+) {
+  // 合计或记录渲染时间。。。
+  console.log(id, '\n',phase,'\n',actualDuration,'\n',baseDuration,'\n',startTime,'\n',commitTime,'\n',interactions)
+}
 
 
 // ========================================
