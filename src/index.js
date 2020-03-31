@@ -2,6 +2,10 @@ import React, {Suspense, Profiler} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+// diff算法 比较两个节点树🌲
+
+
+
 // 不使用JSX
 function NoJsxComp(props) {
   return React.createElement('div', null, `Hello ${props.children}`)
