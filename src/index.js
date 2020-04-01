@@ -1,10 +1,18 @@
-import React, {Suspense, Profiler, useState} from 'react';
+import React, {Suspense, Profiler, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
 // React Hook  --  不编写 class 的情况下使用 state 以及其他的 React 特性
+/**
+ * State Hook  数据仓库
+ * Effect Hook  生命周期
+ * 
+ */
 function HookExample() {
-  const [count, setCount] = useState(9)
+  const [count, setCount] = useState(9) // useState唯一参数：初始值  
+  useEffect(() => {
+    document.title = `你点击了${count}次`
+  })
   return(
     <>
       <p>点击次数：{count}</p>
