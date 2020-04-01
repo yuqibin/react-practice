@@ -2,7 +2,6 @@ import React, {Suspense, Profiler, useState} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
-console.log(666)
 // React Hook  --  不编写 class 的情况下使用 state 以及其他的 React 特性
 function HookExample() {
   const [count, setCount] = useState(9)
