@@ -1,10 +1,86 @@
-import React, {Suspense, Profiler} from 'react';
+import React, {Suspense, Profiler, useState} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import PropTypes from 'prop-types';
+
+// React Hook  --  不编写 class 的情况下使用 state 以及其他的 React 特性
+function HookExample() {
+  const [count, setCount] = useState(9)
+  return(
+    <>
+      <p>点击次数：{count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        click me
+      </button>
+    </>
+  )
+}
+
+
+// 封装复用组件    理解：render prop 是一个用于告知组件需要渲染什么内容的函数 prop
+class Cat extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      myRef: React.createRef()
+    }
+  }
+
+  componentDidMount () {
+    console.log('打印ref所在的DOM:', this.state.myRef.current)
+  }
+
+  render() {
+    const mouse = this.props.mouse;
+    return (
+      <img ref={this.state.myRef} src={require('./imgs/cat.jpeg')} alt="dd" style={{ width: '60px', height: '80px', position: 'absolute', left: mouse.x - 100, top: mouse.y - 500 }} />
+    );
+  }
+}
+
+
+
+class Mouse extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.state = { x: 0, y: 0 };
+  }
+
+  handleMouseMove(event) {
+    this.setState({
+      x: event.clientX,
+      y: event.clientY
+    });
+  }
+
+  render() {
+    return (
+      <div style={{ height: '30vh', background: '#e6c4c4', position: 'relative' }} onMouseMove={this.handleMouseMove}>
+        {this.props.render(this.state)}
+      </div>
+    );
+  }
+}
+
+Mouse.propTypes = {
+  render: PropTypes.func
+}
+
+class MouseTracker extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>移动鼠标!</h1>
+        <Mouse render={mouse => (
+          <Cat mouse={mouse} />
+        )}/>
+      </div>
+    );
+  }
+}
 
 // diff算法 比较两个节点树🌲
-
-
 
 // 不使用JSX
 function NoJsxComp(props) {
@@ -753,6 +829,7 @@ class Game extends React.Component {
           <div className="demo">
             <NoJsxComp>Bob</NoJsxComp>
           </div>
+          <MouseTracker/>
         </div>
       </div>
     );
@@ -776,6 +853,12 @@ function onRenderCallback(
 // ========================================
 
 ReactDOM.render(
-  <Game />,
+  // StrictMode触发额外的检查和警告
+  <React.StrictMode>
+    <div className="top-container">
+      <Game />
+      <HookExample/>
+    </div>
+  </React.StrictMode>,
   document.getElementById('root')
 );

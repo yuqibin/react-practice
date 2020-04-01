@@ -52,10 +52,7 @@ ol, ul {
   margin-left: 20px;
 }
 
-.demo {
-  margin: 100px 0 0 100px;
-  
-}
+
 .demo p {
   margin: 20px 0 0 0;
   font-size: 20px;
@@ -83,4 +80,8 @@ ol, ul {
   transform: translate(-50%, -50%);
   text-align: center;
   line-height: 300px;
+}
+
+.top-container {
+  margin: 100px 0 0 100px;
 }
