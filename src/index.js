@@ -2,8 +2,9 @@ import React, {Suspense, Profiler, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
-import './css/index.less'
+import './css/index.scss'
 
+// 在多个Hook之间传递信息
 // 自定义Hook
 const stuMap = {
   'zhangsan': {
@@ -42,15 +43,38 @@ function Stu(props) {
 
 // 学生列表
 function StuList() {
-  const arr = Object.keys(stuMap)
+  const stuArr = Object.keys(stuMap)
+  const [pickName, setPickName] = useState('zhangsan')
+  const pickStu = useStuName(pickName)
   return(
-    <ul className="stu-list">
-      {
-        arr.map(name => {
-          return <Stu key={name} name={name}></Stu>
-        })
-      }
-    </ul>
+    <>
+      <ul className="stu-list">
+        {
+          stuArr.map(name => {
+            return <Stu key={name} name={name}></Stu>
+          })
+        }
+      </ul>
+      <select value={pickName} onChange={e => setPickName(e.target.value)}>
+        {
+          stuArr.map(name => {
+          return <option key={name} value={name}>{name}</option>
+          })
+        }
+      </select>
+      <p>
+        pickStu: 
+        <span>
+          姓名：{pickStu.name}
+        </span>
+        <span>
+          学号：{pickStu.stuNo}
+        </span>
+        <span>
+          成绩：{pickStu.score}
+        </span>
+      </p>
+    </>
   )
 }
 
