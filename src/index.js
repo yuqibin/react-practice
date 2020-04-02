@@ -2,22 +2,115 @@ import React, {Suspense, Profiler, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
+import './css/index.less'
+
+// 自定义Hook
+const stuMap = {
+  'zhangsan': {
+    name: '张三',
+    stuNo: 10086,
+    score: 98
+  },
+  'lisi': {
+    name: '李四',
+    stuNo: 10085,
+    score: 88
+  },
+  'wangwu': {
+    name: '王五',
+    stuNo: 10088,
+    score: 92
+  }
+}
+
+function Stu(props) {
+  const stu = useStuName(props.name)
+  return(
+      <li>
+        <span>
+          姓名：{stu.name}
+        </span>
+        <span>
+          学号：{stu.stuNo}
+        </span>
+        <span>
+          成绩：{stu.score}
+        </span>
+      </li>
+  )
+}
+
+// 学生列表
+function StuList() {
+  const arr = Object.keys(stuMap)
+  return(
+    <ul className="stu-list">
+      {
+        arr.map(name => {
+          return <Stu key={name} name={name}></Stu>
+        })
+      }
+    </ul>
+  )
+}
+
+// 成绩高于90分学生列表
+function FineStuList() {
+  
+}
+
+function useStuName(name) {
+  const [stu, setStu] = useState({})
+  useEffect(() => {
+    setStu(stuMap[name])
+  }, [name])
+  return stu
+}
+
+// Hook 规则 在顶层，不在任何条件循环函数等句法里   只在react函数中调用  不在普通函数调用
+// 试试把循环放在useState 内 能不能批量进行 useState   no way
+function InputAndHook() {
+  const [input] = useState(React.createRef())
+  const [name, setName] = useState('嘻嘻')
+  return(
+    <p>
+    <input type="text" ref={input} onChange={() => setName(input.current.value)}/>
+      <span>{name}</span>
+    </p>
+  )
+}
+
 // React Hook  --  不编写 class 的情况下使用 state 以及其他的 React 特性
 /**
  * State Hook  数据仓库
  * Effect Hook  生命周期
  * 
  */
+
 function HookExample() {
-  const [count, setCount] = useState(9) // useState唯一参数：初始值  
+  const [count, setCount] = useState(9) // useState唯一参数：初始值
+  const [look, setLook] = useState(0)
+  // useEffect第二个参数可以指定哪个值变化才能执行这个effect  如果第二个参数是空数组 那么这个effect只在挂载时执行一次  更新时不执行
   useEffect(() => {
     document.title = `你点击了${count}次`
-  })
+    console.log('count')
+  }, [count])
+  useEffect(() => {
+    document.title = `你点击了${look}次`
+    console.log('look')
+  }, [look])
+  useEffect(() => {
+    console.log('我只在挂载时打印')
+  }, [])
   return(
     <>
       <p>点击次数：{count}</p>
+      <p>逗比次数： {look}</p>
       <button onClick={() => setCount(count + 1)}>
-        click me
+        click count
+      </button>
+      <button onClick={() => setLook(look + 1)}>
+        click look
       </button>
     </>
   )
@@ -40,11 +133,11 @@ class Cat extends React.Component {
   render() {
     const mouse = this.props.mouse;
     return (
-      <img ref={this.state.myRef} src={require('./imgs/cat.jpeg')} alt="dd" style={{ width: '60px', height: '80px', position: 'absolute', left: mouse.x - 100, top: mouse.y - 500 }} />
+      <img ref={this.state.myRef} src={require('./imgs/cat.jpeg')} alt="dd"
+      style={{ width: '60px', height: '80px', position: 'absolute', left: mouse.x - 150, top: mouse.y - 430 }} />
     );
   }
 }
-
 
 
 class Mouse extends React.Component {
@@ -63,7 +156,7 @@ class Mouse extends React.Component {
 
   render() {
     return (
-      <div style={{ height: '30vh', background: '#e6c4c4', position: 'relative' }} onMouseMove={this.handleMouseMove}>
+      <div style={{ overflow: 'hidden', height: '30vh', background: '#e6c4c4', position: 'relative' }} onMouseMove={this.handleMouseMove}>
         {this.props.render(this.state)}
       </div>
     );
@@ -865,6 +958,8 @@ ReactDOM.render(
     <div className="top-container">
       <Game />
       <HookExample/>
+      <InputAndHook/>
+      <StuList/>
     </div>
   </React.StrictMode>,
   document.getElementById('root')
