@@ -1,10 +1,12 @@
-import React, {Suspense, Profiler, useState, useEffect} from 'react';
+import React, {Suspense, Profiler, useState, useEffect, useContext} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
 import './css/index.scss'
 
-// 在多个Hook之间传递信息
+// Hook API demo
+const LanguageContext = React.createContext('chanese')
+
 // 自定义Hook
 const stuMap = {
   'zhangsan': {
@@ -26,6 +28,8 @@ const stuMap = {
 
 function Stu(props) {
   const stu = useStuName(props.name)
+  // useContext
+  const language = useContext(LanguageContext)
   return(
       <li>
         <span>
@@ -37,6 +41,7 @@ function Stu(props) {
         <span>
           成绩：{stu.score}
         </span>
+        <span>{language}</span>
       </li>
   )
 }
@@ -44,10 +49,14 @@ function Stu(props) {
 // 学生列表
 function StuList() {
   const stuArr = Object.keys(stuMap)
+  // 在多个Hook之间传递信息
   const [pickName, setPickName] = useState('zhangsan')
   const pickStu = useStuName(pickName)
+  
+
   return(
     <>
+      
       <ul className="stu-list">
         {
           stuArr.map(name => {
@@ -63,7 +72,8 @@ function StuList() {
         }
       </select>
       <p>
-        pickStu: 
+        被选中的学生信息  -  -  -  -  -  -  - 
+        <br/>
         <span>
           姓名：{pickStu.name}
         </span>
@@ -451,7 +461,7 @@ class ErrorComp extends React.Component {
 class ThemeButton extends React.Component {
   static contextType = ThemeContext;
   render () {
-  return (<button>{this.context}</button>)
+    return (<button>{this.context}</button>)
   }
 }
 
@@ -475,7 +485,7 @@ function HtmlTmp1() {
   return(
     <div className="demo">
       <ThemeContext.Provider value="dark">
-      <ThemeButton onClick={() => {this.changeContext()}}/>
+        <ThemeButton onClick={() => {this.changeContext()}}/>
       </ThemeContext.Provider>
       <br/>
       <label htmlFor="namedInput">Name:</label>
@@ -983,7 +993,9 @@ ReactDOM.render(
       <Game />
       <HookExample/>
       <InputAndHook/>
-      <StuList/>
+      <LanguageContext.Provider value="english">
+        <StuList/>
+      </LanguageContext.Provider>
     </div>
   </React.StrictMode>,
   document.getElementById('root')
