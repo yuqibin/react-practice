@@ -759,7 +759,7 @@ class Demo extends React.Component {
   }
 
   addNum () {
-    setInterval(() => {
+    return setInterval(() => {
       let num = this.state.num
       num = num + 1
       this.setState({num})
@@ -768,6 +768,10 @@ class Demo extends React.Component {
   // 挂载
   componentDidMount() {
     this.addNum()
+  }
+
+  componentWillUnmount () {
+    window.clearInterval()
   }
 
   render() {
@@ -925,7 +929,7 @@ class Game extends React.Component {
           </div>
         </div>
         <div className="demo">
-          <Demo/>
+          {/* <Demo/> */}
           <Demo2/>
           <Demo3/>
           <Demo4/>
