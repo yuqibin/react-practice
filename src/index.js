@@ -8,6 +8,8 @@ import Practice from './components/practice/practice'
 import Home from './components/home/home'
 import Nothing from './components/404/404'
 import RouterGuard from './router/router-guard/routerGuard'
+import './reduce/reduce'
+
 
 const Login = function () {
   const [isLogin, setIsLogin] = useState(sessionStorage.getItem('uId'))
